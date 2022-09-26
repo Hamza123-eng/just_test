@@ -1,0 +1,40 @@
+Device is turned on
+
+setup function {
+  Device checks if the Wifi SSID has been changed
+
+  if (changed - meaning that the device has been previous set up) {
+    try saved SSIDs and Passwords
+
+    if (connected) {
+      indicator of successful connection (green light or something), could even be a message on the app at some point
+      go into normal operation mode
+    }
+    else {
+      indicator of unsuccessful connection
+      go into wifi-less operation mode
+    }
+  }
+  else (not changed - meaning that the device has never had a wifi network set up it) {
+    BLE setup mode - maybe should have an indicator light signaling this.
+    Wifi set up flow
+    enter normal operation mode
+  }
+}
+
+
+
+NORMAL OPERATION - loop function:
+
+Will use FreeRTOS to allow simultaneous tasking
+
+1. CheckIOT, listen for MQTT messages, download recordings, send success message - every 30 minutes or based on some input from user
+2. PLay recording every time a button is pressed - also count number of times pressed and send in MQTT message in checkIot function
+3. Go into deep sleep between downloads and button presses
+4. Some specific input will allow it to go into BLE setup mode again
+5. Listen for MQTT message for the 'Find My Linkie' feature - could potentially try to go through BLE 
+  but this would require hardware that supports using bluetooth and wifi simultaneously and require bluetooth to always be on 
+  maybe we should look into Bluetooth energy consumption... but seems like a poor trade off, depending on energy usage
+
+
+

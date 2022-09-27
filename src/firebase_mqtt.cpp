@@ -289,6 +289,7 @@ void FireBaseTask(void *param)
                     }
                 }
                 printf("Waiitng for the messages\n");
+                mqtt->loop();
                 vTaskDelay(500);
             }
         }

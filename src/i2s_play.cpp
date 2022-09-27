@@ -111,7 +111,7 @@ void AudioTask(void *param)
 
         music_override = true;
 
-        audio->stop_music_running();
+        // audio->stop_music_running();
         file_name = ExtractFileName(rec_button_i2s);
         if (file_name != NULL)
         {

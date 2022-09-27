@@ -6,6 +6,7 @@
 #include "touch_pad_custom.h"
  #include "sleep_manager.h"
 #include "touch_pad_custom.h"
+#include "esp_sleep.h"
 
 
 #define ACTIVE_TIME (6000) * 10

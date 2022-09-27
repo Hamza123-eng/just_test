@@ -90,59 +90,59 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
  */
 void AudioTask(void *param)
 {
-  // audio = new Audio;
-  // audio->setPinout(16, 26, 25);
-  // audio->setVolume(21);
-  // xQueueReset(xQueueAudioPlay);
+  audio = new Audio;
+  audio->setPinout(16, 26, 25);
+  audio->setVolume(21);
+  xQueueReset(xQueueAudioPlay);
 
-  // if (sleep_wake_press != kTouchIdle)
-  // {
-  //   xQueueSendToBack(xQueueAudioPlay, &(sleep_wake_press), (TickType_t)10);
-  // }
+  if (sleep_wake_press != kTouchIdle)
+  {
+    xQueueSendToBack(xQueueAudioPlay, &(sleep_wake_press), (TickType_t)10);
+  }
 
-  // while (1)
-  // {
+  while (1)
+  {
 
-  //   if (xQueueReceive(xQueueAudioPlay, &(rec_button_i2s), (5 / portTICK_PERIOD_MS)) == 1)
-  //   {
-  //     char *file_name;
-  //     if (audio->isRunning())
-  //     {
+    if (xQueueReceive(xQueueAudioPlay, &(rec_button_i2s), (5 / portTICK_PERIOD_MS)) == 1)
+    {
+      char *file_name;
+      if (audio->isRunning())
+      {
 
-  //       music_override = true;
+        music_override = true;
 
-  //       audio->stop_music_running();
-  //       file_name = ExtractFileName(rec_button_i2s);
-  //       if (file_name != NULL)
-  //       {
-  //         audio->connecttoFS(SPIFFS, file_name);
-  //         end_of_audio = false;
-  //         if (xQueueLedStrip != NULL)
-  //         {
-  //           xQueueSendToBack(xQueueLedStrip, &(rec_button_i2s), (TickType_t)10);
-  //         }
-  //       }
-  //     }
-  //     else
-  //     {
+        audio->stop_music_running();
+        file_name = ExtractFileName(rec_button_i2s);
+        if (file_name != NULL)
+        {
+          audio->connecttoFS(SPIFFS, file_name);
+          end_of_audio = false;
+          if (xQueueLedStrip != NULL)
+          {
+            xQueueSendToBack(xQueueLedStrip, &(rec_button_i2s), (TickType_t)10);
+          }
+        }
+      }
+      else
+      {
 
-  //       file_name = ExtractFileName(rec_button_i2s);
-  //       if (file_name != NULL)
-  //       {
-  //         audio->connecttoFS(SPIFFS, file_name);
-  //         end_of_audio = false;
-  //         if (xQueueLedStrip != NULL)
-  //         {
-  //           xQueueSendToBack(xQueueLedStrip, &(rec_button_i2s), (TickType_t)10);
-  //         }
-  //       }
-  //     }
-  //   }
-  //   if (!end_of_audio)
-  //   {
-  //     audio->loop();
-  //   }
-  // }
+        file_name = ExtractFileName(rec_button_i2s);
+        if (file_name != NULL)
+        {
+          audio->connecttoFS(SPIFFS, file_name);
+          end_of_audio = false;
+          if (xQueueLedStrip != NULL)
+          {
+            xQueueSendToBack(xQueueLedStrip, &(rec_button_i2s), (TickType_t)10);
+          }
+        }
+      }
+    }
+    if (!end_of_audio)
+    {
+      audio->loop();
+    }
+  }
 }
 //}
 

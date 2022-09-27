@@ -44,7 +44,7 @@ void CloudIoTCoreMqtt::mqttConnect(bool skip) {
   Serial.println("Connecting...");
   bool keepgoing = true;
   int count = 0;
-  while (keepgoing && count < 4) {
+  while (keepgoing)  {
     bool result =
         this->mqttClient->connect(
             device->getClientId().c_str(),

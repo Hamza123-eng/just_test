@@ -3,16 +3,17 @@
 
 #include "Arduino.h"
 #include "freertos/queue.h"
+// #include <Firebase_ESP_Client.h>
 
 extern bool firebase_status;
 extern QueueHandle_t xQueueFireBase;
 
+ extern class fb_esp_auth_signin_provider_t auth;
+ extern class fb_esp_cfg_t config;
+
 extern class CloudIoTCoreDevice *device;
 extern class CloudIoTCoreMqtt *mqtt;
 extern class MQTTClient *mqttClient;
-
-extern struct  fb_esp_auth_signin_provider_t auth;
-extern struct fb_esp_cfg_t config;
 
 extern String blue_sender_uuid;
 extern String green_sender_uuid;
@@ -29,20 +30,20 @@ extern RTC_DATA_ATTR uint8_t red_count ;
 extern RTC_DATA_ATTR uint8_t yellow_count ;
 extern RTC_DATA_ATTR bool count_changed ;
 
-extern const char *project_id;
-extern  const char *location;
-extern  const char *registry_id;
+extern char *project_id ;
+extern  char *location ;
+extern  char *registry_id ;
 
-extern const  char *ntp_primary ;
-extern const char *ntp_secondary ;
+extern  char *ntp_primary ;
+extern char *ntp_secondary ;
 
-// extern  int ex_num_topics;
-// extern  char *ex_topics;
+extern  int ex_num_topics;
+extern  char *ex_topics;
 
 // RTC_DATA_ATTR std::string private_key_str = "UNSET";
 // RTC_DATA_ATTR std::string device_id = "UNSET";
 
-//const int jwt_exp_secs = 60 * 20;
+const int jwt_exp_secs = 60 * 20;
 
 void FireBaseInit(void *param);
 void sendPlayCounts();

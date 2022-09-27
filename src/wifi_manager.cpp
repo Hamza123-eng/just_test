@@ -242,8 +242,9 @@ bool SetUpWifiFromList()
 {
     // wifi_try_count++;
     logln("WIFI MANAGER : GOING TO SET THE WIFI BY TRANSVERING the List");
+
     WiFi.mode(WIFI_STA);
-    WiFi.begin("Hamza_islam", "hamza123");
+    WiFi.begin("PTCL-BB", "zeeshan470");
     while (1)
     {
         if (WiFi.status() != WL_CONNECTED)
@@ -252,8 +253,7 @@ bool SetUpWifiFromList()
         }
         if (WiFi.status() == WL_CONNECTED)
         {
-            configTime(0, 0, ntp_primary, ntp_secondary); // necessary to connect to the library
-
+            configTime(0, 0, ntp_primary, ntp_secondary); // necessary to connect to the librar
             printf("WIFI IS connected\n");
             return 1;
         }
@@ -296,7 +296,6 @@ bool SetUpWifiFromList()
 
             if (ssid.length() > 0 && password.length() > 0)
             {
-                configTime(0, 0, ntp_primary, ntp_secondary); // necessary to connect to the library
                 WiFi.begin(ssid.c_str(), password.c_str());
                 //   Serial.println("HEAP 25  " + String(ESP.getFreeHeap()));
                 int count = 0;

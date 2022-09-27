@@ -39,7 +39,7 @@ void setupWifi(){
  // wifi_try_count++;
    // logln("WIFI MANAGER : GOING TO SET THE WIFI BY TRANSVERING the List");
     WiFi.mode(WIFI_STA);
-    WiFi.begin("Hamza_islam", "hamza123");
+    WiFi.begin("PTCL-BB", "zeeshan470");
     while (1)
     {
         if (WiFi.status() != WL_CONNECTED)

@@ -28,7 +28,7 @@
 
 // extern std::string device_id;
 
-// extern void setWifiConfiguration(boolean status, std::string password, std::string ssid);
+// //extern void setWifiConfiguration(boolean status, std::string password, std::string ssid);
 
 // #define SERVICE_UUID_1 "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 // // #define SERVICE_UUID_2 "57c6d1aa-ad06-11ec-b909-0242ac120002"
@@ -321,7 +321,7 @@
 //   //   NimBLEDevice::deinit(true);         // completely disable BLE controller and free up memory
 //   //   Serial.println("BLE ADs ceased !"); // proceed to setup wifi
 //   // }
-// }
+
 // void wifi_handling()
 // {
 //   WiFi.mode(WIFI_MODE_NULL); // Turn off the WiFI completely !!
@@ -332,33 +332,6 @@
 //   // ESP.restart();
 // }
 
-// void wifi_check()
-// {
-//   WiFi.begin(ssid_input.c_str(), password_input.c_str());
-//   boolean WifiStatus;
-//   Serial.println("Checking WiFi");
-//   int count = 0;
-//   while (WiFi.status() != WL_CONNECTED && count < 30)
-//   {
-//     Serial.print(".");
-//     delay(300);
-//     count++;
-//   }
-//   if (WiFi.status() != WL_CONNECTED)
-//   {
-//     Serial.println("Wifi Not Connected");
-//     WifiStatus = false;
-//   }
-//   else
-//   {
-//     Serial.println("Wifi Connected");
-//     WifiStatus = true;
-//   }
-//   WiFi.mode(WIFI_MODE_NULL);
-//   Serial.println("Wifi Turned Off");
-//   BLE_wifi_status_report(WifiStatus);
-//   setWifiConfiguration(WifiStatus, password_input, ssid_input); // to save the correct password on the toy
-// }
 
 // void BLE_wifi_status_report(boolean status)
 // {
@@ -367,24 +340,6 @@
 //   char wifi_status[10];
 //   strcpy(wifi_status, String(status).c_str());
 
-//   // NimBLEServer *pServer = NimBLEDevice::createServer();
-//   // pServer->setCallbacks(new MyServerCallbacks());
-
-//   // NimBLEService *pService = pServer->createService(SERVICE_UUID_2);
-
-//   // pCharacteristic_1 = pService->createCharacteristic(
-//   //   CHARACTERISTIC_1_UUID_TX,
-//   //   NIMBLE_PROPERTY::NOTIFY);
-
-//   // pCharacteristic_1->addDescriptor(new BLE2902());
-
-//   // pService->start();
-//   // NimBLEAdvertising *pAdvertising = NimBLEDevice::getAdvertising();
-//   // pAdvertising->addServiceUUID(SERVICE_UUID_2);
-//   // pAdvertising->start();
-
-//   // pService->start();
-//   // pServer->getAdvertising()->start();
 
 //   pAdvertising->start();
 
@@ -412,4 +367,32 @@
 //     NimBLEDevice::deinit(true);
 //     Serial.println("BLE ADs ceased !");
 //   }
+// }
+
+// void wifi_check()
+// {
+//   WiFi.begin(ssid_input.c_str(), password_input.c_str());
+//   boolean WifiStatus;
+//   Serial.println("Checking WiFi");
+//   int count = 0;
+//   while (WiFi.status() != WL_CONNECTED && count < 30)
+//   {
+//     Serial.print(".");
+//     delay(300);
+//     count++;
+//   }
+//   if (WiFi.status() != WL_CONNECTED)
+//   {
+//     Serial.println("Wifi Not Connected");
+//     WifiStatus = false;
+//   }
+//   else
+//   {
+//     Serial.println("Wifi Connected");
+//     WifiStatus = true;
+//   }
+//   WiFi.mode(WIFI_MODE_NULL);
+//   Serial.println("Wifi Turned Off");
+//   BLE_wifi_status_report(WifiStatus);
+//   //setWifiConfiguration(WifiStatus, password_input, ssid_input); // to save the correct password on the toy
 // }

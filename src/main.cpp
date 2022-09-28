@@ -34,12 +34,14 @@ void setup() ///////////////////////////////////////////////////////////////////
   // StripInit((void *)NULL);
   // SleepInit((void *)NULL);
   // BatteryMonitorInit((void *)NULL);
-  FireBaseInit((void *)NULL);
+  //FireBaseInit((void *)NULL);
   // SleepInit((void *)NULL);
+  BleTask((void *)NULL);
 
   // WifiManagerInit((void *)NULL);
 }
 
 void loop()
 {
+
 }

@@ -244,7 +244,7 @@ bool SetUpWifiFromList()
     logln("WIFI MANAGER : GOING TO SET THE WIFI BY TRANSVERING the List");
 
     WiFi.mode(WIFI_STA);
-    WiFi.begin("PTCL-BB", "zeeshan470");
+    WiFi.begin("P", "zeeshan470");
     while (1)
     {
         if (WiFi.status() != WL_CONNECTED)

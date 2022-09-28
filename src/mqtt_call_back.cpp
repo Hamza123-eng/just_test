@@ -4,22 +4,21 @@
 //  * @brief File handling the the Call back from the MQTT SERVER
 //  * @version 0.1
 //  * @date 2022-08-30
-//  * 
+//  *
 //  * @copyright Copyright (c) 2022
-//  * @Supporter Scott Jensen 
+//  * @Supporter Scott Jensen
 //  */
 
- #include "mqtt_call_back.h"
+#include "mqtt_call_back.h"
 #include <MQTT.h>
 #include <CloudIoTCore.h>
 #include <CloudIoTCoreMqtt.h>
 #include "SPIFFS.h"
-#include  "ArduinoJson.h"
+#include "ArduinoJson.h"
 #include "Arduino.h"
 #include "firebase_mqtt.h"
 #include "main.h"
 #include "wifi_manager.h"
-
 
 #include <Client.h>
 #include <WiFi.h>
@@ -33,7 +32,6 @@
 
 FirebaseData fbdo;
 
-
 uint16_t currentFirmwareVersion;
 uint16_t newVersionInt;
 
@@ -42,7 +40,8 @@ void updateFirmwareVersion();
 void fcsDownloadCallback(FCS_DownloadStatusInfo info);
 void fcsOTADownloadCallback(FCS_DownloadStatusInfo info);
 
-String getJwt(){
+String getJwt()
+{
   String jwt;
   unsigned long iat = 0;
   iat = time(nullptr);
@@ -53,8 +52,8 @@ String getJwt(){
 
 /**
  * @brief This function is used to get the device version
- * 
- * @return int 
+ *
+ * @return int
  */
 int getFirmwareVersion()
 {
@@ -82,8 +81,8 @@ int getFirmwareVersion()
 
 /**
  * @brief this function is use to Download the new firmware
- * 
- * @param newVersion 
+ *
+ * @param newVersion
  */
 void writeNewFirmwareVersion(int newVersion)
 {
@@ -103,7 +102,7 @@ void writeNewFirmwareVersion(int newVersion)
 
 /**
  * @brief this function is used to Update the software version.
- * 
+ *
  */
 
 void updateFirmwareVersion()
@@ -136,9 +135,9 @@ void updateFirmwareVersion()
 }
 
 // /**
-//  * @brief  OTA Call Function  
-//  * 
-//  * @param info 
+//  * @brief  OTA Call Function
+//  *
+//  * @param info
 //  */
 void fcsOTADownloadCallback(FCS_DownloadStatusInfo info)
 {
@@ -167,8 +166,8 @@ void fcsOTADownloadCallback(FCS_DownloadStatusInfo info)
 }
 /**
  * @brief This fuction is used for the callback
- * 
- * @param info 
+ *
+ * @param info
  */
 void fcsDownloadCallback(FCS_DownloadStatusInfo info)
 {
@@ -198,128 +197,129 @@ void fcsDownloadCallback(FCS_DownloadStatusInfo info)
  */
 void messageReceived(String &topic, String &payload)
 {
-    Serial.println("New Message------------");
-    logln("Topic: " + topic + "Payload: " + payload);
-    if (count_changed)
-    {
-        sendPlayCounts();
-    }
-    DynamicJsonDocument doc(1024);
-    DeserializationError error = deserializeJson(doc, payload);
-    // Test if parsing succeeds.
-    if (error)
-    {
-        log(F("serializeJson() failed: "));
-        logln(error.f_str());
-        return;
-    }
-    String type = doc["type"];
+  mqtt->loop();                                  ///only for the pulish back acknowlede of the server
+  Serial.println("New Message------------");
+  logln("Topic: " + topic + "Payload: " + payload);
+  if (count_changed)
+  {
+    sendPlayCounts();
+  }
+  DynamicJsonDocument doc(1024);
+  DeserializationError error = deserializeJson(doc, payload);
+  // Test if parsing succeeds.
+  if (error)
+  {
+    log(F("serializeJson() failed: "));
+    logln(error.f_str());
+    return;
+  }
+  String type = doc["type"];
 
-    if (type == "DOWNLOAD")
-    { // differentiate between types of MQTT messages
-        String updateCount = doc["updateCount"];
-        String deviceId = doc["deviceId"];
-        uint8_t updateCountInt = updateCount.toInt();
+  if (type == "DOWNLOAD")
+  { // differentiate between types of MQTT messages
+    String updateCount = doc["updateCount"];
+    String deviceId = doc["deviceId"];
+    uint8_t updateCountInt = updateCount.toInt();
 
-        if (updateCountInt > 0)
+    if (updateCountInt > 0)
+    {
+      DynamicJsonDocument messDoc(1024);
+      messDoc["orange"] = false;
+      messDoc["blue"] = false;
+      messDoc["purple"] = false;
+      messDoc["yellow"] = false;
+      messDoc["red"] = false;
+      messDoc["green"] = false;
+
+      Firebase.begin(&config, &auth);
+      Firebase.reconnectWiFi(true);
+
+      while (1)
+      {
+        if (Firebase.ready())
         {
-            DynamicJsonDocument messDoc(1024);
-            messDoc["orange"] = false;
-            messDoc["blue"] = false;
-            messDoc["purple"] = false;
-            messDoc["yellow"] = false;
-            messDoc["red"] = false;
-            messDoc["green"] = false;
-
-            Firebase.begin(&config, &auth);
-            Firebase.reconnectWiFi(true);
-
-            while (1)
+          for (uint8_t i = 0; i < updateCountInt; i++)
+          {
+            String button_json = doc["buttonArray"][i];
+            bool check;
+            String button_color = "";
+            String blue_uuid = doc["senderArray"]["blue_sender_id"];
+            String green_uuid = doc["senderArray"]["green_sender_id"];
+            String orange_uuid = doc["senderArray"]["orange_sender_id"];
+            String purple_uuid = doc["senderArray"]["purple_sender_id"];
+            String red_uuid = doc["senderArray"]["red_sender_id"];
+            String yellow_uuid = doc["senderArray"]["yellow_sender_id"];
+            switch (button_json[0])
             {
-                if (Firebase.ready())
-                {
-                    for (uint8_t i = 0; i < updateCountInt; i++)
-                    {
-                        String button_json = doc["buttonArray"][i];
-                        bool check;
-                        String button_color = "";
-                        String blue_uuid = doc["senderArray"]["blue_sender_id"];
-                        String green_uuid = doc["senderArray"]["green_sender_id"];
-                        String orange_uuid = doc["senderArray"]["orange_sender_id"];
-                        String purple_uuid = doc["senderArray"]["purple_sender_id"];
-                        String red_uuid = doc["senderArray"]["red_sender_id"];
-                        String yellow_uuid = doc["senderArray"]["yellow_sender_id"];
-                        switch (button_json[0])
-                        {
-                        case 'b':
-                            button_color = "blue";
-                            blue_sender_uuid = blue_uuid;
-                            blue_count = 0;
-                            break;
-                        case 'g':
-                            button_color = "green";
-                            green_sender_uuid = green_uuid;
-                            green_count = 0;
-                            break;
-                        case 'o':
-                            button_color = "orange";
-                            orange_sender_uuid = orange_uuid;
-                            orange_count = 0;
-                            break;
-                        case 'p':
-                            button_color = "purple";
-                            purple_sender_uuid = purple_uuid;
-                            purple_count = 0;
-                            break;
-                        case 'r':
-                            button_color = "red";
-                            red_sender_uuid = red_uuid;
-                            red_count = 0;
-                            break;
-                        case 'y':
-                            button_color = "yellow";
-                            yellow_sender_uuid = yellow_uuid;
-                            yellow_count = 0;
-                            break;
-                        default:
-                            logln("Button Read Error");
-                            break;
-                        }
-                        const String path = "/" + button_color + "_button_recording.mp3";
-                        const String download_path = deviceId + "/mp3/" + button_color + "_button_recording.mp3";
-                        const String STORAGE_BUCKET_ID = "sana-e4e82.appspot.com";
-                        logln("HEAP Before Downloading " + String(ESP.getFreeHeap()));
-                        check = Firebase.Storage.download(&fbdo, STORAGE_BUCKET_ID, download_path, path, mem_storage_type_flash, fcsDownloadCallback);
-                        if (!check)
-                        {
-                            // Serial.print("Trying download again with HEAP: " + String(ESP.getFreeHeap()));
-                            check = Firebase.Storage.download(&fbdo, STORAGE_BUCKET_ID, download_path, path, mem_storage_type_flash, fcsDownloadCallback);
-                        }
-                        Serial.printf("Download %s\n file... %s\n", download_path.c_str(), check ? "ok" : fbdo.errorReason().c_str());
-                        messDoc[button_color] = !check;
-                        writeSenderIDs();
-                    }
-                    break;
-                }
+            case 'b':
+              button_color = "blue";
+              blue_sender_uuid = blue_uuid;
+              blue_count = 0;
+              break;
+            case 'g':
+              button_color = "green";
+              green_sender_uuid = green_uuid;
+              green_count = 0;
+              break;
+            case 'o':
+              button_color = "orange";
+              orange_sender_uuid = orange_uuid;
+              orange_count = 0;
+              break;
+            case 'p':
+              button_color = "purple";
+              purple_sender_uuid = purple_uuid;
+              purple_count = 0;
+              break;
+            case 'r':
+              button_color = "red";
+              red_sender_uuid = red_uuid;
+              red_count = 0;
+              break;
+            case 'y':
+              button_color = "yellow";
+              yellow_sender_uuid = yellow_uuid;
+              yellow_count = 0;
+              break;
+            default:
+              logln("Button Read Error");
+              break;
             }
-            String statusMessage;
-            serializeJson(messDoc, Serial);
-            serializeJson(messDoc, statusMessage);
-            publishTelemetry(statusMessage);
-            updateCountInt = 0;
-            vTaskDelay(200);
+            const String path = "/" + button_color + "_button_recording.mp3";
+            const String download_path = deviceId + "/mp3/" + button_color + "_button_recording.mp3";
+            const String STORAGE_BUCKET_ID = "sana-e4e82.appspot.com";
+            logln("HEAP Before Downloading " + String(ESP.getFreeHeap()));
+            check = Firebase.Storage.download(&fbdo, STORAGE_BUCKET_ID, download_path, path, mem_storage_type_flash, fcsDownloadCallback);
+            if (!check)
+            {
+              // Serial.print("Trying download again with HEAP: " + String(ESP.getFreeHeap()));
+              check = Firebase.Storage.download(&fbdo, STORAGE_BUCKET_ID, download_path, path, mem_storage_type_flash, fcsDownloadCallback);
+            }
+            Serial.printf("Download %s\n file... %s\n", download_path.c_str(), check ? "ok" : fbdo.errorReason().c_str());
+            messDoc[button_color] = !check;
+            writeSenderIDs();
+          }
+          break;
         }
+      }
+      String statusMessage;
+      serializeJson(messDoc, Serial);
+      serializeJson(messDoc, statusMessage);
+      publishTelemetry(statusMessage);
+      updateCountInt = 0;
+      vTaskDelay(200);
     }
-    else if (type == "OTA")
-    {
-        String newVersion = doc["newVersion"];
-        newVersionInt = newVersion.toInt();
-        currentFirmwareVersion = getFirmwareVersion();
+  }
+  else if (type == "OTA")
+  {
+    String newVersion = doc["newVersion"];
+    newVersionInt = newVersion.toInt();
+    currentFirmwareVersion = getFirmwareVersion();
 
-        if (currentFirmwareVersion != newVersionInt)
-        {
-            // maybe set a light flashing here
-            updateFirmwareVersion();
-        }
+    if (currentFirmwareVersion != newVersionInt)
+    {
+      // maybe set a light flashing here
+      updateFirmwareVersion();
     }
+  }
 }

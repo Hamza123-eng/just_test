@@ -167,7 +167,7 @@ bool CheckSetUpStatus()
  * @param ssid
  */
 
-void setWifiConfiguration(boolean status, std::string password, std::string ssid)
+void setWifiConfiguration(bool status, std::string password, std::string ssid)
 {
     logln("setWifiConfiguration");
     String ssid_string = String(ssid.c_str());
@@ -244,21 +244,21 @@ bool SetUpWifiFromList()
     logln("WIFI MANAGER : GOING TO SET THE WIFI BY TRANSVERING the List");
 
     WiFi.mode(WIFI_STA);
-    WiFi.begin("P", "zeeshan470");
-    while (1)
-    {
-        if (WiFi.status() != WL_CONNECTED)
-        {
-            printf("Waiting for WIFI\n");
-        }
-        if (WiFi.status() == WL_CONNECTED)
-        {
-            configTime(0, 0, ntp_primary, ntp_secondary); // necessary to connect to the librar
-            printf("WIFI IS connected\n");
-            return 1;
-        }
-        delay(1000);
-    }
+    // WiFi.begin("P", "zeeshan470");
+    // while (1)
+    // {
+    //     if (WiFi.status() != WL_CONNECTED)
+    //     {
+    //         printf("Waiting for WIFI\n");
+    //     }
+    //     if (WiFi.status() == WL_CONNECTED)
+    //     {
+    //         configTime(0, 0, ntp_primary, ntp_secondary); // necessary to connect to the librar
+    //         printf("WIFI IS connected\n");
+    //         return 1;
+    //     }
+    //     delay(1000);
+    // }
 
     for (int i = 1; i < 6; i++)
     {
@@ -312,6 +312,8 @@ bool SetUpWifiFromList()
                 else
                 {
                     Serial.println("Wifi " + String(i) + ssid + " connected");
+                    configTime(0, 0, ntp_primary, ntp_secondary); // necessary to connect to the librar
+
                     return 1;
                 }
             }
@@ -334,7 +336,7 @@ bool SetUpWifiFromList()
 
 void WifiManagerInit(void *param)
 {
-    // readWifiFromFile();
+    readWifiFromFile();
 }
 bool TryConnection(void *param)
 {

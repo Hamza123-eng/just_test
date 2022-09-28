@@ -9,6 +9,7 @@
 #include "custom_ble.h"
 #include "WiFi.h"
 #include "NimBLEDevice.h"
+#include "wifi_manager.h"
 
 char ssid[256];
 
@@ -242,7 +243,7 @@ void BleTask(void *param)
           }
           if (ble_status == kGotdata)
           {
-            ble_status == kSuccess;
+            ble_status = kSuccess;
             pAdvertising->stop();
             wifi_check();
             NimBLEDevice::deinit(true);         // completely disable BLE controller and free up memory
@@ -402,7 +403,7 @@ void wifi_check()
   WiFi.mode(WIFI_MODE_NULL);
   Serial.println("Wifi Turned Off");
   BLE_wifi_status_report(WifiStatus);
-  //setWifiConfiguration(WifiStatus, password_input, ssid_input); // to save the correct password on the toy
+  setWifiConfiguration(WifiStatus, password_input, ssid_input); // to save the correct password on the toy
 }
 
 

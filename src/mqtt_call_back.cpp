@@ -198,6 +198,7 @@ void fcsDownloadCallback(FCS_DownloadStatusInfo info)
  */
 void messageReceived(String &topic, String &payload)
 {
+    Serial.println("New Message------------");
     logln("Topic: " + topic + "Payload: " + payload);
     if (count_changed)
     {
@@ -306,6 +307,7 @@ void messageReceived(String &topic, String &payload)
             serializeJson(messDoc, statusMessage);
             publishTelemetry(statusMessage);
             updateCountInt = 0;
+            vTaskDelay(200);
         }
     }
     else if (type == "OTA")

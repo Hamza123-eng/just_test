@@ -111,7 +111,7 @@ void AudioTask(void *param)
 
         music_override = true;
 
-        // audio->stop_music_running();
+     //    audio->stop_music_running();
         file_name = ExtractFileName(rec_button_i2s);
         if (file_name != NULL)
         {
@@ -154,7 +154,7 @@ void AudioTask(void *param)
 
 void AudioInit(void *param)
 {
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
+  vTaskDelay(10 / portTICK_PERIOD_MS);
   /* QUEUE INITILAZATION*/
   xQueueAudioPlay = xQueueCreate(4, sizeof(ButtonPress_t));
   if (xQueueAudioPlay == NULL)

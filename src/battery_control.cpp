@@ -51,6 +51,8 @@ void BatterySoc(void *param)
         voltageLevel = (rawValue / 4095.0) * 2 * 1.1 * 3.3;
         batteryFraction = voltageLevel / MAX_BATTERY_VOLTAGE;
         batteryFraction *= 100;
+
+        printf("RAW %d \n",rawValue);
        
             if (batteryFraction > 80)
                 RGB_color(0, 1, 0);       ////Green
@@ -75,10 +77,10 @@ void BatteryMonitorInit(void *param)
 {
 
     /* QUEUE INITILAZATION*/
-    // pinMode(BATTERY_PIN, INPUT);
-    // pinMode(red_light_pin, OUTPUT);
-    // pinMode(green_light_pin, OUTPUT);
-    // pinMode(blue_light_pin, OUTPUT);
+    pinMode(BATTERY_PIN, INPUT);
+    pinMode(red_light_pin, OUTPUT);
+    pinMode(green_light_pin, OUTPUT);
+    pinMode(blue_light_pin, OUTPUT);
 
-   // xTaskCreatePinnedToCore(&BatterySoc, "BATTERY_Task", 1024 * 3, NULL, 2, NULL, 1);
+   xTaskCreatePinnedToCore(&BatterySoc, "BATTERY_Task", 1024 * 3, NULL, 2, NULL, 1);
 }

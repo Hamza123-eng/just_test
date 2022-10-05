@@ -18,6 +18,7 @@
 #include "sleep_manager.h"
 #include "driver/touch_pad.h"
 #include "i2s_play.h"
+#include "esp_sleep.h"
 
 touch_pad_t touchPin;
 
@@ -271,13 +272,14 @@ void print_wakeup_reason(void *param)
 
 void InitTouchPad(void *param)
 {
-  touchAttachInterrupt(T0, GotTouch1, threshold1);
-  //   touchAttachInterrupt(T1, GotTouch1, threshold1);
-  //   touchAttachInterrupt(T2, GotTouch1, threshold1);
-    touchAttachInterrupt(T3, GotTouch2, (threshold1 ));
-    touchAttachInterrupt(T4, GotTouch3, (threshold1 ));
-    touchAttachInterrupt(T5, GotTouch4, threshold1);
-    touchAttachInterrupt(T6, GotTouch5, (threshold1));
-  touchAttachInterrupt(T7, GotTouch6, threshold1);
+  touchAttachInterrupt(T0, GotTouch0, threshold1);
+    touchAttachInterrupt(T1, GotTouch1, threshold1);
+    touchAttachInterrupt(T2, GotTouch2, threshold1);
+    touchAttachInterrupt(T3, GotTouch3, (threshold1 ));
+    touchAttachInterrupt(T4, GotTouch4, (threshold1 ));
+    touchAttachInterrupt(T5, GotTouch5, threshold1);
+    touchAttachInterrupt(T6, GotTouch6, (threshold1));
+  touchAttachInterrupt(T7, GotTouch7, threshold1);
+  touchAttachInterrupt(T8, GotTouch8, threshold1);
    touchAttachInterrupt(T9, GotTouch7, threshold1);
 }

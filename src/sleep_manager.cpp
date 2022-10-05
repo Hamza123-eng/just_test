@@ -9,7 +9,7 @@
 #include "esp_sleep.h"
 
 
-#define ACTIVE_TIME (6000) * 10
+#define ACTIVE_TIME (1000) * 10
 #define SLEEP_TIME (1000 * 1000) * 30
 
 TaskHandle_t xTaskSleepManager = NULL;

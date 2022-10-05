@@ -183,7 +183,7 @@ void BleTask(void *param)
         ble_status = kTimeOut;
         break;
       }
-      vTaskDelay(3000 / portTICK_PERIOD_MS);
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     else if (deviceConnected)
     {
@@ -193,7 +193,7 @@ void BleTask(void *param)
       {
         if (ScanNetwork())
         {
-          scan_refresh = SCAN_REFRESH_TIME / (1000 * 3);
+          scan_refresh = SCAN_REFRESH_TIME / (1000 * 1);
 
           memset(ssid, 0, 256);
           strcpy(ssid, networks.c_str());
@@ -214,6 +214,7 @@ void BleTask(void *param)
             std::string delim = "__";
             int length = passwordAndNetwork.length();
             Serial.println("Password Length : " + String(length));
+            vTaskDelay(500 / portTICK_PERIOD_MS);
 
             if (length < 8) // is this an arbitrary number os is 8 a standard password minimum length?
             {
@@ -234,8 +235,8 @@ void BleTask(void *param)
             }
 
             scan_refresh -= 1;
-            vTaskDelay(3000 / portTICK_PERIOD_MS);
-          }
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+          }     //pass acquire
           /* Why come from Data Get Loop*/
           if (!deviceConnected)
           {
@@ -246,90 +247,29 @@ void BleTask(void *param)
             ble_status = kSuccess;
             pAdvertising->stop();
             wifi_check();
-            NimBLEDevice::deinit(true);         // completely disable BLE controller and free up memory
             Serial.println("BLE ADs ceased !"); // proceed to setup wifi
             break;                              /* SCAN BREAK*/
           }
           /* Why Come from the data Get loop*/
-        }
+        }            
         else
         {
           logln("BLE SETUP: NO NETWORK IN SCANNING");
           ble_status = kScanFailed;
         }
 
-        if (ble_status == kSuccess){break;}
-
-        vTaskDelay(3000 / portTICK_PERIOD_MS);
-      }                                               /*END OF the Scanner Of Wifi LOOP*/
-    }                                                /*End Of device Connection LOOP*/
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+      }                                             /*END OF the Scanner Of Wifi LOOP while*/
+      if (ble_status == kSuccess){break;}                                    
+    }                                                /*End Of else if if device connected*/
     else
     {
       /*Going to fullfill the CXX Compilence*/
     }
-  }
-
+  }                // while loop final
+            NimBLEDevice::deinit(true);         // completely disable BLE controller and free up memory
   logln("DONE WITh BLE");
 }
-  // /* previous */
-  // if (ScanNetwork())
-  // {
-
-  //   while (!deviceConnected && timeOut)
-  //   {
-  //     if (millis() - BLE_millis > BLE_DELAY)
-  //     {
-  //       timeOut = false;
-  //     }
-  //     vTaskDelay(3000 / portTICK_PERIOD_MS);
-  //   }
-
-  //   if (deviceConnected)
-  //   {
-  //     strcpy(ssid, networks.c_str());
-
-  //     Serial.println(ssid);
-
-  //     pCharacteristic_0->setValue(ssid);
-  //     pCharacteristic_5->setValue(pass.c_str());
-
-  //     pCharacteristic_0->notify();
-  //     pCharacteristic_5->notify();
-
-  //     while (!pass_acquired && deviceConnected &&)
-  //     {
-  //       pCharacteristic_0->notify();
-  //       std::string passwordAndNetwork = pCharacteristic_5->getValue(); // expecting a value from client side
-  //       std::string delim = "__";
-  //       int length = passwordAndNetwork.length();
-  //       Serial.println("Password Length : " + String(length));
-  //       delay(500);
-  //       if (length < 8) // is this an arbitrary number os is 8 a standard password minimum length?
-  //       {
-  //         Serial.println("Password incomplete , try again !");
-  //       }
-  //       else
-  //       {
-  //         Serial.println("Password acquired !");
-  //         size_t pos = 0;
-  //         int i = 0;
-  //         while ((pos = passwordAndNetwork.find(delim)) != std::string::npos)
-  //         {
-  //           ssid_input = passwordAndNetwork.substr(0, pos);
-  //           passwordAndNetwork.erase(0, pos + delim.length());
-  //           password_input = passwordAndNetwork;
-  //           Serial.println(String(i));
-  //           i++;
-  //         }
-  //         pass_acquired = true;
-  //       }
-  //     }
-  //     pAdvertising->stop();
-  //     wifi_check();
-  //   }
-  //   NimBLEDevice::deinit(true);         // completely disable BLE controller and free up memory
-  //   Serial.println("BLE ADs ceased !"); // proceed to setup wifi
-  // }
 
 void wifi_handling()
 {

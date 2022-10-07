@@ -28,6 +28,9 @@
 #include <CloudIoTCoreMqtt.h>
 #include "config.h"
 #include "addons/TokenHelper.h"
+#include <stdlib.h>
+#include <string.h>
+#include "sleep_manager.h"
 
 // String UNSET = "UNSET";
 
@@ -79,6 +82,11 @@ char *ex_topics;
 
 std::string private_key_str = "UNSET";
 std::string device_id = "UNSET";
+std::string wifi_entry = "UNSET";
+
+uint8_t wifi_entry_index = 1;
+
+bool wifi_audio = true;
 
 /*************************cert here**********************************/
 const char *root_cert =
@@ -168,8 +176,10 @@ bool FillFireBaseCredential()
                 deserializeJson(deviceIdentifiers, read_file);
                 device_id = deviceIdentifiers["device_id"].as<std::string>();
                 private_key_str = deviceIdentifiers["private_key"].as<std::string>();
+                // wifi_entry = deviceIdentifiers["wifi_entry"].as<std::string>();
                 logln("New device ID: " + String(device_id.c_str()));
                 // logln("New private key: " + String(private_key_str.c_str()));
+                //  wifi_entry_index=atio(wifi_entry);
                 return 1;
             }
         }
@@ -194,7 +204,7 @@ void ConnectToTopics()
 
     mqtt->loop();
     mqtt->mqttConnect();
-    printf("TOPICS SUBSCRIBED\n");
+    printf("--------TOPICS SUBSCRIBED--------\n");
 }
 
 /**
@@ -203,7 +213,9 @@ void ConnectToTopics()
  */
 void sendPlayCounts()
 {
-    printf("IN SEND PLAY COUNT\n");
+    prev_tick_count = xTaskGetTickCount();
+
+    printf("------IN SEND PLAY COUNT-----\n");
     if (blue_count + green_count + orange_count + purple_count + red_count + yellow_count > 0)
     {
         DynamicJsonDocument message(1024);
@@ -252,7 +264,7 @@ void FireBaseTask(void *param)
     WifiManagerInit((void *)NULL);
     readSenderIDs();
 
-     FillFireBaseCredential();
+    FillFireBaseCredential();
 
     /*Setup the cloud*/
 
@@ -270,17 +282,17 @@ void FireBaseTask(void *param)
             {
                 if (!firebase_status)
                 {
-                    printf("Going to Connect to the topics\n");
+                    printf("------- Going to Connect to the topics- --------\n");
                     ConnectToTopics();
                     firebase_status = true;
                 }
                 else if (!mqttClient->connected())
                 {
-                    printf("In desired\n");
+
                     firebase_status = false;
                     break;
                 }
-                /*Every thisng here is good do Action here*/
+                /*Every thing here is good do Action here*/
                 else
                 {
                     if ((xQueueReceive(xQueueFireBase, &(dummy), (5 / portTICK_PERIOD_MS)) == 1))
@@ -288,9 +300,9 @@ void FireBaseTask(void *param)
                         sendPlayCounts();
                     }
                 }
-                printf("Waiitng for the messages\n");
+                printf("-----Waiitng for the firebase messages-------\n");
                 mqtt->loop();
-                vTaskDelay(1000);
+                vTaskDelay(100);
             }
         }
         else

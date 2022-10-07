@@ -19,26 +19,24 @@
 void setup() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
   
-  //print_wakeup_reason((void *)NULL);
+  print_wakeup_reason((void *)NULL);
 
    Serial.begin(115200);
 
-// SpiffsInit((void *)NULL);
-  // if (!SPIFFS.begin()) // initializing SPIFFS
-  // {
-  //   SPIFFS.begin(true);
-  // }
+SpiffsInit((void *)NULL);
+  if (!SPIFFS.begin()) // initializing SPIFFS
+  {
+    SPIFFS.begin(true);
+  }
 
-  //  InitTouchPad((void *)NULL);
-  //  AudioInit((void *)NULL);
-  //  StripInit((void *)NULL);
-  //  SleepInit((void *)NULL);
+   InitTouchPad((void *)NULL);
+   AudioInit((void *)NULL);
+    StripInit((void *)NULL);
+    SleepInit((void *)NULL);
   // BatteryMonitorInit((void *)NULL);
-  // FireBaseInit((void *)NULL);
-  // SleepInit((void *)NULL);
-  BleTask((void *)NULL);
+   FireBaseInit((void *)NULL);
+  BleInit((void *)NULL);
 
-  // WifiManagerInit((void *)NULL);
 }
 
 void loop()

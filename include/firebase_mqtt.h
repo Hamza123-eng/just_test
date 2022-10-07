@@ -52,5 +52,8 @@ bool publishTelemetry(String subfolder, String data);
 bool publishTelemetry(String data);
 /*Certificate is here*/
 
+extern uint8_t wifi_entry_index;
+
+extern bool wifi_audio;
 
 #endif

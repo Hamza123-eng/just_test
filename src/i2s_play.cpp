@@ -23,6 +23,9 @@
 
 Audio *audio;
 
+uint8_t volumn = 15;
+bool volumn_stroble = true;
+
 TaskHandle_t xTaskAudioPlay = NULL;
 QueueHandle_t xQueueAudioPlay = NULL;
 
@@ -42,6 +45,9 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
 {
   switch (rec_button_i2s)
   {
+  case 0:
+    // blue_count++;
+    return (char *)("call_button_recording.mp3");
   case 1:
     blue_count++;
     return (char *)("blue_button_recording.mp3");
@@ -54,9 +60,8 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
     orange_count++;
     return (char *)("orange_button_recording.mp3");
 
-  case 4:
-    yellow_count++;
-    return (char *)("yellow_button_recording.mp3");
+  case 4: // ble
+    return (char *)("ble_button_recording.mp3");
 
   case 5:
     red_count++;
@@ -67,16 +72,16 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
     return (char *)("purple_button_recording.mp3");
 
   case 7:
-
+        yellow_count++;
     return (char *)("goodbye_button_recording.mp3");
 
   case 9:
-    // blue_count++;
-    return (char *)("camera_button_recording.mp3");
+    // blue_count++;      //volum
+    return (char *)("volumn_button_recording.mp3");
 
   case 10:
     // blue_count++;
-    return (char *)("call_button_recording.mp3");
+    return (char *)("wificon_recording.mp3");
   default:
     return NULL;
   }
@@ -90,9 +95,7 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
  */
 void AudioTask(void *param)
 {
-  audio = new Audio;
   audio->setPinout(16, 26, 25);
-  audio->setVolume(21);
   xQueueReset(xQueueAudioPlay);
 
   if (sleep_wake_press != kTouchIdle)
@@ -105,13 +108,15 @@ void AudioTask(void *param)
 
     if (xQueueReceive(xQueueAudioPlay, &(rec_button_i2s), (5 / portTICK_PERIOD_MS)) == 1)
     {
+      audio->setVolume(volumn);
+
       char *file_name;
       if (audio->isRunning())
       {
 
         music_override = true;
 
-     //    audio->stop_music_running();
+        audio->stop_music_running();
         file_name = ExtractFileName(rec_button_i2s);
         if (file_name != NULL)
         {
@@ -165,7 +170,7 @@ void AudioInit(void *param)
   {
     printf("********PLAY AUDIO QUEUE CREATED SUCESSFULLY*******\n");
 
-    xTaskCreatePinnedToCore(&AudioTask, "I2S_Task", 1024 * 10, NULL, 3, &xTaskAudioPlay, 1);
+    xTaskCreatePinnedToCore(&AudioTask, "I2S_Task", 1024 * 8, NULL, 3, &xTaskAudioPlay, 0);
   }
 }
 /**

@@ -10,4 +10,7 @@ extern QueueHandle_t xQueueAudioPlay;
 
 void AudioInit(void *param);
 
+extern uint8_t volumn;
+extern bool volumn_stroble
+
 #endif

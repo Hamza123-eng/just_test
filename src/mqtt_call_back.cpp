@@ -29,6 +29,7 @@
 #include <CloudIoTCore.h>
 #include <CloudIoTCoreMqtt.h>
 #include "firebase_mqtt.h"
+#include "sleep_manager.h"
 
 FirebaseData fbdo;
 
@@ -141,6 +142,7 @@ void updateFirmwareVersion()
 //  */
 void fcsOTADownloadCallback(FCS_DownloadStatusInfo info)
 {
+  prev_tick_count = xTaskGetTickCount();
   logln("OTA HEAP  " + String(ESP.getFreeHeap()));
   if (info.status == fb_esp_fcs_download_status_init)
   {
@@ -170,7 +172,8 @@ void fcsOTADownloadCallback(FCS_DownloadStatusInfo info)
  * @param info
  */
 void fcsDownloadCallback(FCS_DownloadStatusInfo info)
-{
+{ 
+  prev_tick_count = xTaskGetTickCount();
   if (info.status == fb_esp_fcs_download_status_init)
   {
     Serial.printf("Downloading file %s (%d) to %s\n", info.remoteFileName.c_str(), info.fileSize, info.localFileName.c_str());
@@ -197,6 +200,8 @@ void fcsDownloadCallback(FCS_DownloadStatusInfo info)
  */
 void messageReceived(String &topic, String &payload)
 {
+  prev_tick_count = xTaskGetTickCount();
+  
   mqtt->loop();                                  ///only for the pulish back acknowlede of the server
   Serial.println("New Message------------");
   logln("Topic: " + topic + "Payload: " + payload);

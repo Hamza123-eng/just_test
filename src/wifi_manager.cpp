@@ -15,6 +15,11 @@
 #include "main.h"
 #include "ArduinoJson.h"
 #include "firebase_mqtt.h"
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
+#include "touch_pad_custom.h"
+#include "i2s_play.h"
 
 #include "SPIFFS.h"
 
@@ -159,6 +164,47 @@ bool CheckSetUpStatus()
     return false;
 }
 
+void getWifiIndex(bool write)
+{
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        // NVS partition was truncated and needs to be erased
+        // Retry nvs_flash_init
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+
+    nvs_handle my_handle;
+    err = nvs_open("storage", NVS_READWRITE, &my_handle);
+
+    uint8_t dummy;
+
+    if (write)
+    {
+        err = nvs_get_u8(my_handle, "wifi_entry_index", &dummy);
+        switch (err)
+        {
+        case ESP_OK:
+            wifi_entry_index = dummy;
+            break;
+        case ESP_ERR_NVS_NOT_FOUND:
+            nvs_set_u8(my_handle, "restart_counter", wifi_entry_index);
+            break;
+        default:
+            printf("Error (%s) reading!\n", esp_err_to_name(err));
+        }
+    }
+
+    // Write
+    else
+    {
+        nvs_set_u8(my_handle, "restart_counter", wifi_entry_index);
+    }
+
+    err = nvs_commit(my_handle);
+    nvs_close(my_handle);
+}
 /* @brief Set the Wifi Configuration object this is the call back which is
  * called form the BLE.
  *
@@ -173,33 +219,35 @@ void setWifiConfiguration(bool status, std::string password, std::string ssid)
     String ssid_string = String(ssid.c_str());
     String pass_string = String(password.c_str());
 
+    getWifiIndex(true);
+
     if (!status)
     {
         return;
     }
     else
     {
-        if (SSID_1.length() == 0)
+        if (wifi_entry_index == 1)
         {
             SSID_1 = ssid_string;
             password_1 = pass_string;
         }
-        else if (SSID_2.length() == 0)
+        else if (wifi_entry_index == 2)
         {
             SSID_2 = ssid_string;
             password_2 = pass_string;
         }
-        else if (SSID_3.length() == 0)
+        else if (wifi_entry_index == 3)
         {
             SSID_3 = ssid_string;
             password_3 = pass_string;
         }
-        else if (SSID_4.length() == 0)
+        else if (wifi_entry_index == 4)
         {
             SSID_4 = ssid_string;
             password_4 = pass_string;
         }
-        else if (SSID_5.length() == 0)
+        else if (wifi_entry_index == 5)
         {
             SSID_5 = ssid_string;
             password_5 = pass_string;
@@ -208,6 +256,20 @@ void setWifiConfiguration(bool status, std::string password, std::string ssid)
         {
             logln("All 5 wifi spots are full");
         }
+
+        /*here going to control the */
+
+        if (wifi_entry_index == 5)
+        {
+            wifi_entry_index = 1;
+        }
+        else
+        {
+            wifi_entry_index++;
+        }
+
+        getWifiIndex(false);
+
         File write_file = SPIFFS.open("/wifi.json", "w");
         DynamicJsonDocument wifi(1024);
         wifi["SSID_1"] = SSID_1;
@@ -244,21 +306,6 @@ bool SetUpWifiFromList()
     logln("WIFI MANAGER : GOING TO SET THE WIFI BY TRANSVERING the List");
 
     WiFi.mode(WIFI_STA);
-    // WiFi.begin("P", "zeeshan470");
-    // while (1)
-    // {
-    //     if (WiFi.status() != WL_CONNECTED)
-    //     {
-    //         printf("Waiting for WIFI\n");
-    //     }
-    //     if (WiFi.status() == WL_CONNECTED)
-    //     {
-    //         configTime(0, 0, ntp_primary, ntp_secondary); // necessary to connect to the librar
-    //         printf("WIFI IS connected\n");
-    //         return 1;
-    //     }
-    //     delay(1000);
-    // }
 
     for (int i = 1; i < 6; i++)
     {
@@ -345,14 +392,19 @@ bool TryConnection(void *param)
 
         if (SetUpWifiFromList())
         {
-            logln("SYSTEM WIFI IS NOW CONNECTED");
+            logln("******** SYSTEM WIFI IS NOW CONNECTED *******");
+            if(wifi_audio)
+            {
+            ButtonPress_t rec_button = kTouch10;
+            xQueueSendToBack(xQueueAudioPlay, &(rec_button), 0);
+            }
             break;
         }
         else
         {
-            logln("Failed To Connect To Wifi from amny reason Check it");
+            logln("************  Trying to connect wifi  **************");
         }
-        vTaskDelay(500);
+        vTaskDelay(100);
     }
 
     return 1;

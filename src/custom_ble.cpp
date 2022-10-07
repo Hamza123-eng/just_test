@@ -1,34 +1,32 @@
 // #include "custom_ble.h"
 
-
-
-
-
 #include <BLE.h>
 #include "main.h"
 #include "custom_ble.h"
 #include "WiFi.h"
 #include "NimBLEDevice.h"
 #include "wifi_manager.h"
+#include "freertos/queue.h"
+#include "freertos/task.h"
+#include "touch_pad_custom.h"
+#include "i2s_play.h"
 
 char ssid[256];
 
 bool deviceConnected = false;
 bool pass_acquired = false;
 static uint8_t counter = 0;
+uint8_t scan_refresh = 0;
+
 int txValue = 0;
 String pass;
 std::string value;
 std::string password_input;
 std::string ssid_input;
-std::string device_id_1="TEST_DEVICE";
+std::string device_id_1 = "TEST_DEVICE";
 String networks = String(device_id_1.c_str());
 
 unsigned long BLE_millis = millis();
-
-#define BLE_WAIT 90000
-
-#define SCAN_REFRESH_TIME 1000 * 30 // in the millis second
 
 BleStatus_t ble_status = kIdle;
 
@@ -38,7 +36,7 @@ NimBLEAdvertising *pAdvertising;
 
 extern std::string device_id_1;
 
-//extern void setWifiConfiguration(boolean status, std::string password, std::string ssid);
+// extern void setWifiConfiguration(boolean status, std::string password, std::string ssid);
 
 #define SERVICE_UUID_1 "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 // #define SERVICE_UUID_2 "57c6d1aa-ad06-11ec-b909-0242ac120002"
@@ -68,6 +66,8 @@ class MyCallbackHandler : public BLECharacteristicCallbacks
 {
   void onWrite(BLECharacteristic *pCharacteristic)
   {
+    scan_refresh = SCAN_REFRESH_TIME / (1000 * 1);
+
     value = pCharacteristic->getValue();
     int len = value.length();
 
@@ -168,8 +168,6 @@ void BleTask(void *param)
   bool timeOut = true;
   BLE_millis = millis();
 
-  uint8_t scan_refresh = 0;
-
   /*DEVICE CONDITION*/
   ble_status = kIdle;
 
@@ -208,7 +206,6 @@ void BleTask(void *param)
 
           while (!pass_acquired && scan_refresh > 0 && deviceConnected)
           {
-
             pCharacteristic_0->notify();
             std::string passwordAndNetwork = pCharacteristic_5->getValue(); // expecting a value from client side
             std::string delim = "__";
@@ -236,7 +233,7 @@ void BleTask(void *param)
 
             scan_refresh -= 1;
             vTaskDelay(1000 / portTICK_PERIOD_MS);
-          }     //pass acquire
+          } // pass acquire
           /* Why come from Data Get Loop*/
           if (!deviceConnected)
           {
@@ -251,7 +248,7 @@ void BleTask(void *param)
             break;                              /* SCAN BREAK*/
           }
           /* Why Come from the data Get loop*/
-        }            
+        }
         else
         {
           logln("BLE SETUP: NO NETWORK IN SCANNING");
@@ -259,15 +256,18 @@ void BleTask(void *param)
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
-      }                                             /*END OF the Scanner Of Wifi LOOP while*/
-      if (ble_status == kSuccess){break;}                                    
-    }                                                /*End Of else if if device connected*/
+      } /*END OF the Scanner Of Wifi LOOP while*/
+      if (ble_status == kSuccess)
+      {
+        break;
+      }
+    } /*End Of else if if device connected*/
     else
     {
       /*Going to fullfill the CXX Compilence*/
     }
-  }                // while loop final
-            NimBLEDevice::deinit(true);         // completely disable BLE controller and free up memory
+  }                           // while loop final
+  NimBLEDevice::deinit(true); // completely disable BLE controller and free up memory
   logln("DONE WITh BLE");
 }
 
@@ -281,14 +281,12 @@ void wifi_handling()
   // ESP.restart();
 }
 
-
 void BLE_wifi_status_report(boolean status)
 {
   Serial.println("Initializing BLE with Wifi Status" + String(status) + "\n");
 
   char wifi_status[10];
   strcpy(wifi_status, String(status).c_str());
-
 
   pAdvertising->start();
 
@@ -346,4 +344,18 @@ void wifi_check()
   setWifiConfiguration(WifiStatus, password_input, ssid_input); // to save the correct password on the toy
 }
 
-
+void BleInit(void *param)
+{
+  /*necessary thing here*/
+  bool order;
+  while (1)
+  {
+    if (xQueueReceive(xQueueBleOperation, &(order), (2000 / portTICK_PERIOD_MS)) == 1)
+    {
+      ButtonPress_t rec_button=kTouch4;
+      xQueueSendToBack(xQueueAudioPlay,&(rec_button), 0);
+      BleTask((void *)NULL);
+      xQueueReset(xQueueAudioPlay);
+    }
+  }
+}

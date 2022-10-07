@@ -21,6 +21,7 @@ enum ButtonPress_t
     kTouch7,
     kTouch8,
     kTouch9,
+    kTouch10,
     kTouchIdle,
 
 };

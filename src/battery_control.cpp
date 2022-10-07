@@ -48,28 +48,28 @@ void BatterySoc(void *param)
     {
         /* code */
         rawValue = analogRead(BATTERY_PIN);
-        voltageLevel = (rawValue / 4095.0) * 2 * 1.1 * 3.3;
-        batteryFraction = voltageLevel / MAX_BATTERY_VOLTAGE;
-        batteryFraction *= 100;
+        // voltageLevel = (rawValue / 4095.0) * 2 * 1.1 * 3.3;
+        // batteryFraction = voltageLevel / MAX_BATTERY_VOLTAGE;
+        // batteryFraction *= 100;
 
         printf("RAW %d \n",rawValue);
        
-            if (batteryFraction > 80)
-                RGB_color(0, 1, 0);       ////Green
+        //     if (batteryFraction > 80)
+        //         RGB_color(0, 1, 0);       ////Green
 
-            else if (batteryFraction > 50)
-                RGB_color(0, 0, 1);       // blue
+        //     else if (batteryFraction > 50)
+        //         RGB_color(0, 0, 1);       // blue
 
-            else if (batteryFraction > 20)
-                RGB_color(1, 1, 0);     // yellow
+        //     else if (batteryFraction > 20)
+        //         RGB_color(1, 1, 0);     // yellow
 
-            else if (batteryFraction > 5)
-                RGB_color(1, 0, 0);      // red
+        //     else if (batteryFraction > 5)
+        //         RGB_color(1, 0, 0);      // red
 
-            else
-                RGB_color(1, 1, 1);      // red
+        //     else
+        //         RGB_color(1, 1, 1);      // red
         
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
@@ -78,9 +78,9 @@ void BatteryMonitorInit(void *param)
 
     /* QUEUE INITILAZATION*/
     pinMode(BATTERY_PIN, INPUT);
-    pinMode(red_light_pin, OUTPUT);
-    pinMode(green_light_pin, OUTPUT);
-    pinMode(blue_light_pin, OUTPUT);
+    // pinMode(red_light_pin, OUTPUT);
+    // pinMode(green_light_pin, OUTPUT);
+    // pinMode(blue_light_pin, OUTPUT);
 
-   xTaskCreatePinnedToCore(&BatterySoc, "BATTERY_Task", 1024 * 3, NULL, 2, NULL, 1);
+  // xTaskCreatePinnedToCore(&BatterySoc, "BATTERY_Task", 1024 * 3, NULL, 2, NULL, 1);
 }

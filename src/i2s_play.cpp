@@ -24,15 +24,15 @@
 Audio *audio;
 
 uint8_t volumn = 15;
-bool volumn_stroble = true;
 
 TaskHandle_t xTaskAudioPlay = NULL;
 QueueHandle_t xQueueAudioPlay = NULL;
 
 ButtonPress_t rec_button_i2s;
 
+bool imp_music = false;
+bool volumn_stroble = true;
 bool music_override = false;
-
 bool end_of_audio = false;
 /**
  * @brief This function is used to retur teh file name eith respect to the button call
@@ -45,43 +45,52 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
 {
   switch (rec_button_i2s)
   {
-  case 0:
+  case kTouch0:
     // blue_count++;
+    imp_music = true;
     return (char *)("call_button_recording.mp3");
-  case 1:
+  case kTouch1:
     blue_count++;
+    imp_music = true;
     return (char *)("blue_button_recording.mp3");
 
-  case 2:
+  case kTouch2:
     green_count++;
+    imp_music = true;
     return (char *)("green_button_recording.mp3");
 
-  case 3:
+  case kTouch3:
     orange_count++;
+    imp_music = true;
     return (char *)("orange_button_recording.mp3");
 
-  case 4: // ble
+  case kble: // ble
     return (char *)("ble_button_recording.mp3");
 
-  case 5:
+  case kTouch5:
     red_count++;
+    imp_music = true;
     return (char *)("red_button_recording.mp3");
 
-  case 6:
+  case kTouch6:
     purple_count++;
+    imp_music = true;
     return (char *)("purple_button_recording.mp3");
 
-  case 7:
-        yellow_count++;
+  case kTouch7:
+    yellow_count++;
+    imp_music = true;
     return (char *)("goodbye_button_recording.mp3");
 
-  case 9:
-    // blue_count++;      //volum
+  case kvolumn:
     return (char *)("volumn_button_recording.mp3");
 
-  case 10:
-    // blue_count++;
+  case kconnect:
     return (char *)("wificon_recording.mp3");
+
+  case kdisconnect:
+    return (char *)("wifidis_recording.mp3");
+
   default:
     return NULL;
   }
@@ -187,7 +196,7 @@ void audio_eof_mp3(const char *)
     xQueueSendToBack(xQueueLedStrip, &(prev_button), (TickType_t)10);
   }
   /*only for the sendCount from here*/
-  if (xQueueFireBase != NULL)
+  if (xQueueFireBase != NULL && imp_music)
   {
     if (uxQueueSpacesAvailable(xQueueFireBase) == 2)
     {
@@ -197,4 +206,5 @@ void audio_eof_mp3(const char *)
   }
   prev_tick_count = xTaskGetTickCount();
   music_override = false;
+  imp_music=false;
 }

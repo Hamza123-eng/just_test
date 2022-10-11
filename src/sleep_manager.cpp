@@ -42,7 +42,7 @@ void SleepTask(void *param)
         if (temp_ticks > ACTIVE_TIME)
         {
             printf("------- GOING FOR SLEEP BYE BYE--------\n");
-            vTaskDelay(10);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
             esp_sleep_enable_timer_wakeup(SLEEP_TIME);
             
             touchAttachInterrupt(T4, dummy, (20));
@@ -62,5 +62,5 @@ void SleepTask(void *param)
 
 void SleepInit(void *param)
 {
-    xTaskCreatePinnedToCore(&SleepTask, "I2S_Task", 1024 * 2, NULL, 3, &xTaskSleepManager, 1);
+    xTaskCreatePinnedToCore(&SleepTask, "I2S_Task", 1024 * 2, NULL, 3, &xTaskSleepManager, 0);
 }

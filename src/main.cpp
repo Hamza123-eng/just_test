@@ -1,6 +1,6 @@
 
 
-#
+
 #include "SPIFFS.h"
 
 #include "custom_ble.h"
@@ -18,28 +18,30 @@
 
 void setup() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
-  
+
   print_wakeup_reason((void *)NULL);
 
-   Serial.begin(115200);
+  Serial.begin(115200);
 
-SpiffsInit((void *)NULL);
+  // SpiffsInit((void *)NULL);
   if (!SPIFFS.begin()) // initializing SPIFFS
   {
     SPIFFS.begin(true);
   }
 
-   InitTouchPad((void *)NULL);
-   AudioInit((void *)NULL);
-    StripInit((void *)NULL);
-    SleepInit((void *)NULL);
+  InitTouchPad((void *)NULL);
+  AudioInit((void *)NULL);
+  StripInit((void *)NULL);
+  SleepInit((void *)NULL);
   // BatteryMonitorInit((void *)NULL);
-   FireBaseInit((void *)NULL);
+  FireBaseInit((void *)NULL);
   BleInit((void *)NULL);
-
 }
 
 void loop()
 {
-
+  while (1)
+  {
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+  }
 }

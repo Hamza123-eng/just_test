@@ -3,8 +3,10 @@
 
 #include "Arduino.h"
 #include "freertos/queue.h"
-// #include <Firebase_ESP_Client.h>
+#include "freertos/task.h"
 
+// #include <Firebase_ESP_Client.h>
+extern TaskHandle_t xTaskFireBase;
 extern bool firebase_status;
 extern QueueHandle_t xQueueFireBase;
 

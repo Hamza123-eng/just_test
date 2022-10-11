@@ -164,7 +164,7 @@ bool CheckSetUpStatus()
     return false;
 }
 
-void getWifiIndex(bool write)
+void getWifiIndex(bool read)
 {
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
@@ -180,7 +180,7 @@ void getWifiIndex(bool write)
 
     uint8_t dummy;
 
-    if (write)
+    if (read)
     {
         err = nvs_get_u8(my_handle, "wifi_entry_index", &dummy);
         switch (err)
@@ -189,17 +189,17 @@ void getWifiIndex(bool write)
             wifi_entry_index = dummy;
             break;
         case ESP_ERR_NVS_NOT_FOUND:
-            nvs_set_u8(my_handle, "restart_counter", wifi_entry_index);
+            nvs_set_u8(my_handle, "wifi_entry_index", wifi_entry_index);
             break;
         default:
-            printf("Error (%s) reading!\n", esp_err_to_name(err));
+            break;
         }
     }
 
     // Write
     else
     {
-        nvs_set_u8(my_handle, "restart_counter", wifi_entry_index);
+        nvs_set_u8(my_handle, "wifi_entry_index", wifi_entry_index);
     }
 
     err = nvs_commit(my_handle);
@@ -393,10 +393,16 @@ bool TryConnection(void *param)
         if (SetUpWifiFromList())
         {
             logln("******** SYSTEM WIFI IS NOW CONNECTED *******");
-            if(wifi_audio)
+            while (1)
             {
-            ButtonPress_t rec_button = kTouch10;
-            xQueueSendToBack(xQueueAudioPlay, &(rec_button), 0);
+                if (wifi_audio && !imp_music)
+                {
+                    ButtonPress_t rec_button = kconnect;
+                    xQueueSendToBack(xQueueAudioPlay, &(rec_button), 0);
+                    wifi_audio = false;
+                    break;
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
             }
             break;
         }
@@ -404,7 +410,7 @@ bool TryConnection(void *param)
         {
             logln("************  Trying to connect wifi  **************");
         }
-        vTaskDelay(100);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 
     return 1;

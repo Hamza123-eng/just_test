@@ -41,6 +41,7 @@ bool touch_event_happened = false;
 uint8_t touch_count = TOUCH_TIME_TO_ENABLE_BLE / 1000;
 uint8_t volumn_count = TOUCH_TIME_TO_ENABLE_VOLUMN / 1000;
 
+void GetVolumn(bool read);
 /**
  * @brief  function below are the Touch Pad Interupt handler
  * When interupt happened that interuupt is propagate to the Audio Queue
@@ -300,9 +301,9 @@ void DecideVolumnStrobe()
       volumn_stroble = true;
     }
   }
-  ButtonPress_t rec_button = kTouch9;
+  ButtonPress_t rec_button = kvolumn;
   xQueueSendToBack(xQueueAudioPlay, &(rec_button), 0);
-  GetVolumn(false);
+  GetVolumn(false); // write the new volumn
 }
 
 void SendNotification()
@@ -323,7 +324,7 @@ void SendNotification()
 
 void GetVolumn(bool read)
 {
-
+  printf("----- GOING TO READ VOLUMN FROM FLASH -----\n");
   esp_err_t err = nvs_flash_init();
   if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
   {
@@ -344,12 +345,13 @@ void GetVolumn(bool read)
     switch (err)
     {
     case ESP_OK:
-      wifi_entry_index = dummy;
+      volumn = dummy;
       break;
     case ESP_ERR_NVS_NOT_FOUND:
-      nvs_set_u8(my_handle, "volumn", wifi_entry_index);
+      nvs_set_u8(my_handle, "volumn", volumn);
       break;
     default:
+      break;
     }
   }
 
@@ -387,7 +389,7 @@ void TouchPoll(void *param)
       SendNotification();
       state = false;
     }
-    
+
     vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
 }
@@ -399,6 +401,7 @@ void TouchPoll(void *param)
 
 void InitTouchPad(void *param)
 {
+  printf("------- TOUCH PAD INITLIZATION ---------\n");
   touchAttachInterrupt(T0, GotTouch0, threshold1);
   touchAttachInterrupt(T1, GotTouch1, threshold1);
   touchAttachInterrupt(T2, GotTouch2, threshold1);
@@ -413,13 +416,13 @@ void InitTouchPad(void *param)
 
   if (xQueueBleOperation == NULL)
   {
-    printf("********BLE NOTIFIY  QUEUE IS NOT CREATED SUCESSFULLY*******\n");
+    printf("******** BLE NOTIFIY  QUEUE IS NOT CREATED SUCESSFULLY *******\n");
   }
   else
   {
-    printf("********BLE NOTIFIY QUEUE CREATED SUCESSFULLY*******\n");
+    printf("******** BLE NOTIFIY QUEUE CREATED SUCESSFULLY *******\n");
 
-    xTaskCreatePinnedToCore(&TouchPoll, "Touch", 1024 * 4, NULL, 3, &xTaskTouchPoll, 1);
+    xTaskCreatePinnedToCore(&TouchPoll, "Touch", 1024 * 3, NULL, 3, &xTaskTouchPoll, 1);
   }
 
   //   touchAttachInterrupt(T9, GotTouch9, threshold1);

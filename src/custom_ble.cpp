@@ -1,15 +1,22 @@
 // #include "custom_ble.h"
 
+// #include <BLE.h>
+// #include "main.h"
+// #include "custom_ble.h"
+// #include "WiFi.h"
+// #include "NimBLEDevice.h"
+// #include "wifi_manager.h"
+ #include "touch_pad_custom.h"
+ #include "i2s_play.h"
+ #include "freertos/queue.h"
+
 #include <BLE.h>
 #include "main.h"
 #include "custom_ble.h"
 #include "WiFi.h"
 #include "NimBLEDevice.h"
 #include "wifi_manager.h"
-#include "freertos/queue.h"
-#include "freertos/task.h"
-#include "touch_pad_custom.h"
-#include "i2s_play.h"
+#include "firebase_mqtt.h"
 
 char ssid[256];
 
@@ -127,10 +134,10 @@ bool ScanNetwork()
 }
 void BleTask(void *param)
 {
-  Serial.println("Initializing BLE\n");
+  Serial.println("----Initializing BLE-----");
   Serial.println("device id: " + String(device_id_1.c_str()));
   WiFi.mode(WIFI_MODE_NULL);
-  Serial.println("Turn off Wifi");
+  Serial.println("-----Turn off Wifi for BLE---");
   NimBLEDevice::init("Retarduino");
   // MTU Request here
   NimBLEDevice::setMTU(500);
@@ -163,7 +170,7 @@ void BleTask(void *param)
   Serial.println("Networks" + networks);
 
   Serial.println("deviceConnected" + String(deviceConnected));
-  Serial.println("Waiting for a BLE connection...");
+  Serial.println("--->Waiting for a BLE connection...");
 
   bool timeOut = true;
   BLE_millis = millis();
@@ -268,7 +275,7 @@ void BleTask(void *param)
     }
   }                           // while loop final
   NimBLEDevice::deinit(true); // completely disable BLE controller and free up memory
-  logln("DONE WITh BLE");
+  logln("---DONE WITH BLE---");
 }
 
 void wifi_handling()
@@ -276,7 +283,6 @@ void wifi_handling()
   WiFi.mode(WIFI_MODE_NULL); // Turn off the WiFI completely !!
   Serial.println("WiFi turned off, initializing BLE again !");
   BLE_setup(); // re-initializing BLE
-
   // Serial.println("Restarting...");
   // ESP.restart();
 }
@@ -320,7 +326,7 @@ void wifi_check()
 {
   WiFi.begin(ssid_input.c_str(), password_input.c_str());
   boolean WifiStatus;
-  Serial.println("Checking WiFi");
+  //Serial.println("Checking WiFi");
   int count = 0;
   while (WiFi.status() != WL_CONNECTED && count < 30)
   {
@@ -330,11 +336,15 @@ void wifi_check()
   }
   if (WiFi.status() != WL_CONNECTED)
   {
+     ButtonPress_t rec_button=kdisconnect;
+      xQueueSendToBack(xQueueAudioPlay,&(rec_button), 0);
     Serial.println("Wifi Not Connected");
     WifiStatus = false;
   }
   else
   {
+     ButtonPress_t rec_button=kconnect;
+      xQueueSendToBack(xQueueAudioPlay,&(rec_button), 0);
     Serial.println("Wifi Connected");
     WifiStatus = true;
   }
@@ -344,18 +354,27 @@ void wifi_check()
   setWifiConfiguration(WifiStatus, password_input, ssid_input); // to save the correct password on the toy
 }
 
-void BleInit(void *param)
-{
+
+  void BleTask1(void *param)
+  {
   /*necessary thing here*/
   bool order;
   while (1)
   {
-    if (xQueueReceive(xQueueBleOperation, &(order), (2000 / portTICK_PERIOD_MS)) == 1)
+    if (xQueueReceive(xQueueBleOperation, &(order), (1500 / portTICK_PERIOD_MS)) == 1)
     {
-      ButtonPress_t rec_button=kTouch4;
+      ButtonPress_t rec_button=kble;
       xQueueSendToBack(xQueueAudioPlay,&(rec_button), 0);
+      vTaskSuspend(xTaskFireBase);
       BleTask((void *)NULL);
+      vTaskResume(xTaskFireBase);
+
       xQueueReset(xQueueAudioPlay);
     }
   }
+}
+
+void BleInit(void *param)
+{
+    xTaskCreatePinnedToCore(&BleTask1 ,"BLE_Task", 1024 * 6, NULL, 4, NULL, 1);
 }

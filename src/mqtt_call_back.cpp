@@ -312,7 +312,7 @@ void messageReceived(String &topic, String &payload)
       serializeJson(messDoc, statusMessage);
       publishTelemetry(statusMessage);
       updateCountInt = 0;
-      vTaskDelay(200);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
   }
   else if (type == "OTA")

@@ -302,14 +302,14 @@ void FireBaseTask(void *param)
                 }
                 printf("-----Waiitng for the firebase messages-------\n");
                 mqtt->loop();
-                vTaskDelay(100);
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
             }
         }
         else
         {
             TryConnection(NULL);
         }
-        vTaskDelay(300);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }
 

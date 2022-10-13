@@ -32,10 +32,10 @@ void setup() ///////////////////////////////////////////////////////////////////
   InitTouchPad((void *)NULL);
   AudioInit((void *)NULL);
   StripInit((void *)NULL);
-  SleepInit((void *)NULL);
+  // SleepInit((void *)NULL);
   // BatteryMonitorInit((void *)NULL);
-  FireBaseInit((void *)NULL);
   BleInit((void *)NULL);
+  FireBaseInit((void *)NULL);
 }
 
 void loop()

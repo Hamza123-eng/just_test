@@ -82,6 +82,11 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
     imp_music = true;
     return (char *)("goodbye_button_recording.mp3");
 
+  case kTouch8:
+    purple_count++;
+    imp_music = true;
+    return (char *)("purple_button_recording.mp3");
+
   case kvolumn:
     return (char *)("volumn_button_recording.mp3");
 
@@ -102,8 +107,9 @@ char *ExtractFileName(ButtonPress_t rec_button_i2s)
  *
  * @param None
  */
-void AudioTask(void *param)
+void IRAM_ATTR AudioTask(void *param)
 {
+  audio = new Audio;
   audio->setPinout(16, 26, 25);
   xQueueReset(xQueueAudioPlay);
 
@@ -179,7 +185,7 @@ void AudioInit(void *param)
   {
     printf("********PLAY AUDIO QUEUE CREATED SUCESSFULLY*******\n");
 
-    xTaskCreatePinnedToCore(&AudioTask, "I2S_Task", 1024 * 8, NULL, 3, &xTaskAudioPlay, 0);
+    xTaskCreatePinnedToCore(&AudioTask, "I2S_Task", 1024 * 6, NULL, 3, &xTaskAudioPlay, 0);
   }
 }
 /**

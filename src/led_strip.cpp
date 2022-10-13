@@ -81,7 +81,7 @@ void SetStripColor(ButtonPress_t led_strip_request)
  *
  * @param param
  */
-void LedStripTask(void *param)
+void IRAM_ATTR LedStripTask(void *param)
 {
 
     while (1)

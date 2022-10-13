@@ -365,7 +365,7 @@ void GetVolumn(bool read)
   nvs_close(my_handle);
 }
 
-void TouchPoll(void *param)
+void IRAM_ATTR TouchPoll(void *param)
 {
   GetVolumn(true);
   bool state = false;
@@ -390,7 +390,7 @@ void TouchPoll(void *param)
       state = false;
     }
 
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -403,8 +403,8 @@ void InitTouchPad(void *param)
 {
   printf("------- TOUCH PAD INITLIZATION ---------\n");
   touchAttachInterrupt(T0, GotTouch0, threshold1);
-  touchAttachInterrupt(T1, GotTouch1, threshold1);
-  touchAttachInterrupt(T2, GotTouch2, threshold1);
+  //touchAttachInterrupt(T1, GotTouch1, threshold1);
+  //touchAttachInterrupt(T2, GotTouch2, threshold1);
   touchAttachInterrupt(T3, GotTouch3, (threshold1));
   //  touchAttachInterrupt(T4, GotTouch4, (threshold1));
   touchAttachInterrupt(T5, GotTouch5, threshold1);

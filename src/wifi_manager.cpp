@@ -398,7 +398,7 @@ bool TryConnection(void *param)
                 if (wifi_audio && !imp_music)
                 {
                     ButtonPress_t rec_button = kconnect;
-                    xQueueSendToBack(xQueueAudioPlay, &(rec_button), 0);
+                    // xQueueSendToBack(xQueueAudioPlay, &(rec_button), 0);
                     wifi_audio = false;
                     break;
                 }

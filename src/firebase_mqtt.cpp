@@ -280,6 +280,7 @@ void FireBaseTask(void *param)
         {
             while (1)
             {
+                Serial.println(esp_get_free_heap_size());
                 if (!firebase_status)
                 {
                     printf("------- Going to Connect to the topics- --------\n");
@@ -324,6 +325,8 @@ void FireBaseInit(void *param)
     {
         printf("********FireBasePLAY AUDIO QUEUE CREATED SUCESSFULLY*******\n");
 
-        xTaskCreatePinnedToCore(&FireBaseTask, "FireBase_Task", 1024 * 10, NULL, 3, &xTaskFireBase, 1);
+        FireBaseTask(NULL);
+
+        // xTaskCreatePinnedToCore(&FireBaseTask, "FireBase_Task", 1024 * 30, NULL, 3, &xTaskFireBase, 1);
     }
 }

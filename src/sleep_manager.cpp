@@ -32,7 +32,7 @@ void dummy()
  * @param param 
  */
 
-void SleepTask(void *param)
+void IRAM_ATTR SleepTask(void *param)
 {
     prev_tick_count = xTaskGetTickCount();
 

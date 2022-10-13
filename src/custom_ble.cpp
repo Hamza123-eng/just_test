@@ -355,7 +355,7 @@ void wifi_check()
 }
 
 
-  void BleTask1(void *param)
+  void IRAM_ATTR BleTask1(void *param)
   {
   /*necessary thing here*/
   bool order;
@@ -363,6 +363,7 @@ void wifi_check()
   {
     if (xQueueReceive(xQueueBleOperation, &(order), (1500 / portTICK_PERIOD_MS)) == 1)
     {
+      printf("I am going into BLE mode \n");
       ButtonPress_t rec_button=kble;
       xQueueSendToBack(xQueueAudioPlay,&(rec_button), 0);
       vTaskSuspend(xTaskFireBase);

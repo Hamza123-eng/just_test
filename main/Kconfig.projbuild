@@ -1,0 +1,76 @@
+menu "Example Configuration"
+
+    config EXAMPLE_FIRMWARE_UPGRADE_URL
+        string "firmware upgrade url endpoint"
+        default "https://192.168.0.3:8070/hello_world.bin"
+        help
+            URL of server which hosts the firmware
+            image.
+
+    config EXAMPLE_FIRMWARE_UPGRADE_URL_FROM_STDIN
+        bool
+        default y if EXAMPLE_FIRMWARE_UPGRADE_URL = "FROM_STDIN"
+
+    config EXAMPLE_SKIP_COMMON_NAME_CHECK
+        bool "Skip server certificate CN fieldcheck"
+        default n
+        help
+            This allows you to skip the validation of OTA server certificate CN field.
+
+    config EXAMPLE_FIRMWARE_UPGRADE_BIND_IF
+        bool "Support firmware upgrade bind specified interface"
+        default n
+        help
+            This allows you to bind specified interface in OTA example.
+
+    choice EXAMPLE_FIRMWARE_UPGRADE_BIND_IF_TYPE
+        prompt "Choose OTA data bind interface"
+        default EXAMPLE_FIRMWARE_UPGRADE_BIND_IF_STA
+        depends on EXAMPLE_FIRMWARE_UPGRADE_BIND_IF
+        help
+            Select which interface type of OTA data go through.
+
+        config EXAMPLE_FIRMWARE_UPGRADE_BIND_IF_STA
+            bool "Bind wifi station interface"
+            depends on EXAMPLE_CONNECT_WIFI
+            help
+                Select wifi station interface to pass the OTA data.
+
+        config EXAMPLE_FIRMWARE_UPGRADE_BIND_IF_ETH
+            bool "Bind ethernet interface"
+            depends on EXAMPLE_CONNECT_ETHERNET
+            help
+                Select ethernet interface to pass the OTA data.
+    endchoice
+endmenu
+
+menu "HAWKBIT CONFIGRATION"
+
+    config HAWKBIT_SERVER_PATH
+        string "Hawkbit url"
+        default "128.199.236.110:80"
+        help
+            URL of server which hosts the firmware
+            image.
+    config CONTROLLER_ID
+        string "Controller Id"
+        default "Remote_well"
+        help
+            Controller ID of target.
+    config SECURITY_TOKEN_TYPE
+            string "Security Token Type"
+            default "TargetToken"
+            help
+                Select Between the TargetToken or GatewayToken.           
+    config SECURITY_TOKEN
+            string "Security Token"
+            default "5ec7a109186878a23d74d026f1631733"
+            help
+                Token Number. 
+    config HAWKBIT_TENANTS
+            string "Hawkbit Tenant"
+            default "DEFAULT"
+            help
+                Hawkbit Tenants. 
+                
+endmenu
